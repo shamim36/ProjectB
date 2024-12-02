@@ -69,7 +69,7 @@ public class BookStoreView {
         });
         bookListMenuBtn.setOnAction(event -> {
             primaryStage.close();
-            MenuPage(false);
+            MenuPage(false); // this is a normal user, thats why passed false value.
         });
 
         vbox = new VBox(5, label, bookListMenuBtn, adminMenuBtn);
@@ -258,7 +258,6 @@ public class BookStoreView {
 
             MainApp mainApp = new MainApp();
             mainApp.start(stage);
-            // stage.close();
 
         });
         VBox layout;
@@ -271,7 +270,6 @@ public class BookStoreView {
             layout = new VBox(10, searchBox, backBtn, tableView);
             layout.setAlignment(Pos.CENTER);
         }
-        // Layout for the window
 
         // Create the scene and show it
         Scene scene = new Scene(layout, 800, 600);

@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 class BookStoreModel implements AddRemoveBook {
@@ -33,7 +32,7 @@ class BookStoreModel implements AddRemoveBook {
     }
 
     public HashMap<Integer, Book> searchBooks(String title) {
-        HashMap<Integer, Book> machedResult = new LinkedHashMap<>();
+        HashMap<Integer, Book> machedResult = new HashMap();
         for (Book book : books) {
             int i = 1;
             if (book instanceof Book && book.getTitle().equals(title)) {
@@ -152,13 +151,10 @@ class User {
     }
 
     public boolean isAdmin() {
-        try {
-            if (this.userID.equals("admin") && this.userPassword.equals("admin")) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
+
+        if (this.userID.equals("admin") && this.userPassword.equals("admin")) {
+            return true;
+        } else {
             return false;
         }
 
