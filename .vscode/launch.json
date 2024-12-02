@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        
+        {
+            "type": "java",
+            "name": "BookStoreModel",
+            "request": "launch",
+            "mainClass": "BookStoreModel",
+            "projectName": "ProjectB_a265ea1d",
+            "vmArgs": "--module-path \"C:\\JavaFX\\javafx-sdk-17.0.13\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "BookStoreSystemController",
+            "request": "launch",
+            "mainClass": "BookStoreSystemrController",
+            "projectName": "ProjectB_a265ea1d",
+            "vmArgs": "--module-path \"C:\\JavaFX\\javafx-sdk-17.0.13\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "BookStoreView",
+            "request": "launch",
+            "mainClass": "BookStoreView",
+            "projectName": "ProjectB_a265ea1d",
+            "vmArgs": "--module-path \"C:\\JavaFX\\javafx-sdk-17.0.13\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "MainApp",
+            "request": "launch",
+            "mainClass": "MainApp",
+            "projectName": "ProjectB_a265ea1d",
+            "vmArgs": "--module-path \"C:\\JavaFX\\javafx-sdk-17.0.13\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+    ]
+}
