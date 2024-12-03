@@ -39,8 +39,6 @@ public class BookStoreView {
     public BookStoreView(BookStoreModel bookStoreModel, Book bookModel, User userModel, Stage primaryStage,
             BookStoreSystemController controller) {
 
-        // Create a SimpleIntegerProperty to track the number of clicks.
-
         this.primaryStage = primaryStage;
         this.controller = controller;
         this.bookModel = bookModel;
