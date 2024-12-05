@@ -13,8 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
-import java.util.HashMap;
-
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
@@ -29,21 +27,17 @@ public class BookStoreView {
     Button backBtn;
     BookStatus status;
     Genre genre;
-    private BookStoreSystemController controller;
+    private BookStoreController controller;
     private SimpleIntegerProperty loginAttemptProperty = new SimpleIntegerProperty(0);
     private Stage primaryStage;
-    private BookStoreModel bookStoreModel;
-    private Book bookModel;
-    private User userModel;
+    private Model model;
 
-    public BookStoreView(BookStoreModel bookStoreModel, Book bookModel, User userModel, Stage primaryStage,
-            BookStoreSystemController controller) {
+    public BookStoreView(Model model, Stage primaryStage,
+            BookStoreController controller) {
 
         this.primaryStage = primaryStage;
         this.controller = controller;
-        this.bookModel = bookModel;
-        this.bookStoreModel = bookStoreModel;
-        this.userModel = userModel;
+        this.model = model;
 
         initialHomePage();
 
@@ -78,23 +72,21 @@ public class BookStoreView {
         Stage stage = new Stage();
         stage.setTitle("Admin Login");
 
-        // User ID input
+        // userId input
         TextField inputUserIdField = new TextField();
         inputUserIdField.setPromptText("Enter your user ID");
         HBox userIdRow = new HBox(5, new Label("User ID: "), inputUserIdField);
         userIdRow.setAlignment(Pos.CENTER);
 
-        // Password input
+        // user password input
         TextField inputPasswordField = new TextField();
         inputPasswordField.setPromptText("Enter your password");
         HBox userPasswordRow = new HBox(5, new Label("Password: "), inputPasswordField);
         userPasswordRow.setAlignment(Pos.CENTER);
 
-        // Login status message
         Label loginAttemptMessage = new Label("");
         Label loginMessage = new Label("Only For Admin");
 
-        // Login button
         Button adminLoginBtn = new Button("Admin Login");
         Button backBtn = new Button("DashBoard");
 
@@ -112,23 +104,22 @@ public class BookStoreView {
 
         adminLoginBtn.setOnAction(event -> {
 
-            // Incrementing login attempt how many times it clicked
+            // show how many times login button clicked with wrong login credintial
             loginAttemptProperty.set(loginAttemptProperty.get() + 1);
 
-            // Read the input values inside the button click handler
             String inputId = inputUserIdField.getText();
             String inputPassword = inputPasswordField.getText();
 
             String systemUserId = controller.checkUserID();
             String systemPassword = controller.checkUserID();
 
-            // Check credentials using the controller
+            // check login credintial
             if (systemUserId.equals(inputId) && systemPassword.equals(inputPassword)) {
                 loginMessage.setText("Login Successful!");
                 stage.close();
                 MenuPage(true);
 
-            } 
+            }
         });
         backBtn.setOnAction(event -> {
             stage.close();
@@ -137,12 +128,10 @@ public class BookStoreView {
 
         });
 
-        // Layout for the login window
         VBox loginBox = new VBox(10, userIdRow, userPasswordRow, adminLoginBtn, backBtn, loginMessage,
                 loginAttemptMessage);
         loginBox.setAlignment(Pos.CENTER);
 
-        // Set up the scene and show the stage
         Scene scene = new Scene(loginBox, 600, 300);
         stage.setScene(scene);
         stage.show();
@@ -185,13 +174,19 @@ public class BookStoreView {
             addBookBtn.setAlignment(Pos.BOTTOM_RIGHT);
         }
 
-        // Initialize the book list with demo data
+        // Initialize data for a sample book
         controller.createBook("Java", Genre.TECHNOLOGY, BookStatus.AVAILABLE, "Robert", 35.99, 2, 10);
+        controller.createBook("Python", Genre.TECHNOLOGY, BookStatus.AVAILABLE, "Robert", 35.99, 2, 10);
+        controller.createBook("Ruby", Genre.TECHNOLOGY, BookStatus.AVAILABLE, "Robert", 35.99, 2, 10);
+        controller.createBook("Overlord", Genre.FICTION, BookStatus.AVAILABLE, "Sam", 39.99, 20, 20);
+        controller.createBook("Drawing", Genre.ART, BookStatus.AVAILABLE, "Liam", 10.99, 499, 60);
+        controller.createBook("JavaFx", Genre.TECHNOLOGY, BookStatus.AVAILABLE, "Robert", 35.99, 2, 10);
+        controller.createBook("Theory of Blackhole", Genre.SCIENCE, BookStatus.AVAILABLE, "Alber o'Brian", 99.99, 33,
+                5);
 
-        // Create the TableView
         TableView<Book> tableView = new TableView<>(FXCollections.observableArrayList(controller.getBookList()));
 
-        // Create columns for the TableView
+        // tableview - create colum
         TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
         titleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitle()));
 
@@ -214,15 +209,19 @@ public class BookStoreView {
         quantityColumn.setCellValueFactory(
                 cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantityAvailable()).asObject());
 
-        TableColumn<Book, Double> discountPercentageColumn = new TableColumn<>("Discount (%)");
+        TableColumn<Book, Integer> discountPercentageColumn = new TableColumn<>("Discount (%)");
         discountPercentageColumn.setCellValueFactory(
-                cellData -> new SimpleDoubleProperty(cellData.getValue().getDiscountPercentage()).asObject());
+                cellData -> new SimpleIntegerProperty(cellData.getValue().getDiscountPercentage()).asObject());
 
         TableColumn<Book, Double> discountPriceColumn = new TableColumn<>("Discount Price");
         discountPriceColumn.setCellValueFactory(
                 cellData -> new SimpleDoubleProperty(cellData.getValue().getPriceAfterMaximumDiscount()).asObject());
+        TableColumn<Book, String> targetAgeColumn = new TableColumn<>("Target Age");
+        targetAgeColumn
+                .setCellValueFactory(
+                        cellData -> new SimpleStringProperty(cellData.getValue().getTargetAgeGroup().toString()));
 
-        // Add all columns to the TableView
+        // add all the colums to the tableview
         tableView.getColumns().addAll(
                 titleColumn,
                 authorColumn,
@@ -231,27 +230,26 @@ public class BookStoreView {
                 priceColumn,
                 quantityColumn,
                 discountPercentageColumn,
-                discountPriceColumn);
+                discountPriceColumn,
+                targetAgeColumn);
 
-        // Add Book button action
         addBookBtn.setOnAction(event -> {
-            showAddBookDialog(stage, tableView);
+            showAddBookWindow(stage, tableView);
         });
 
-        // Remove Book button action
         removeBookBtn.setOnAction(event -> {
             Book selectedBook = tableView.getSelectionModel().getSelectedItem();
             if (selectedBook != null) {
-                // Remove from model
+                // remove book booklist from model
                 boolean removed = controller.removeBook(selectedBook.getTitle());
                 if (removed) {
-                    // Remove from table
+                    // remove book from tableview
                     tableView.getItems().remove(selectedBook);
                 }
             }
         });
 
-        // going Home Page and it will automatically logout from admin page
+        // going home page
         backBtn.setOnAction(event -> {
 
             MainApp mainApp = new MainApp();
@@ -260,35 +258,30 @@ public class BookStoreView {
         });
         VBox layout;
         if (isAdmin) {
-            // Layout for the window
             layout = new VBox(10, searchBox, addRemoveBox, backBtn, tableView);
             layout.setAlignment(Pos.CENTER);
         } else {
-            // Layout for the window
             layout = new VBox(10, searchBox, backBtn, tableView);
             layout.setAlignment(Pos.CENTER);
         }
 
-        // Create the scene and show it
-        Scene scene = new Scene(layout, 800, 600);
+        Scene scene = new Scene(layout, 1000, 600);
         stage.setScene(scene);
         stage.show();
     }
 
-    private void showAddBookDialog(Stage parentStage, TableView<Book> tableView) {
-        // Dialog for adding a new book
+    private void showAddBookWindow(Stage stage, TableView<Book> tableView) {
         Stage dialog = new Stage();
-        dialog.initOwner(parentStage);
+        dialog.initOwner(stage);
         dialog.setTitle("Add New Book");
 
-        // Input fields for book details
         TextField titleField = new TextField();
         titleField.setPromptText("Title");
 
         TextField authorField = new TextField();
         authorField.setPromptText("Author");
 
-        // Toggle group to set status
+        // status group
         ToggleGroup genreGroup = new ToggleGroup();
         ToggleGroup statusGroup = new ToggleGroup();
         RadioButton fictionBtn = new RadioButton("FICTION");
@@ -330,7 +323,7 @@ public class BookStoreView {
         HBox buttonBox = new HBox(10, saveButton, cancelButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Layout for the dialog
+        // Add book dialog layeyout
         VBox dialogLayout = new VBox(10,
                 new Label("Enter Book Details"),
                 new HBox(10, new Label("Genre:"), genreRadioBtnRow),
@@ -348,23 +341,22 @@ public class BookStoreView {
         dialog.setScene(dialogScene);
         dialog.show();
 
-        // Save button action
         saveButton.setOnAction(event -> {
             String title = titleField.getText();
             String author = authorField.getText();
 
             double price = Double.parseDouble(priceField.getText());
             int quantity = Integer.parseInt(quantityField.getText());
-            double discount = Double.parseDouble(discountField.getText());
+            int discount = Integer.parseInt(discountField.getText());
 
-            // setting Book Status
+            // booksStatus setting
             if (availableBtn.isSelected()) {
                 status = BookStatus.AVAILABLE;
             } else if (reservedBtn.isSelected()) {
                 status = BookStatus.RESERVED;
             }
 
-            // Setting book genre
+            // book genre setting
             if (fictionBtn.isSelected()) {
                 genre = Genre.FICTION;
             } else if (technologyBtn.isSelected()) {
@@ -375,19 +367,19 @@ public class BookStoreView {
                 genre = Genre.SCIENCE;
             }
 
-            // Create new book object
-            controller.setBookDetails(title, genre, status, author, price, quantity, discount);
+            // new book object create
+            controller.setBookDetails(title, genre, status, author, price, quantity,
+                    discount);
 
-            // Add book to the controller
-            boolean added = controller.addBook(bookModel);
-            if (added) {
-                tableView.getItems().add(bookModel);
-                dialog.close();
-            }
+            // book add
+
+            controller.createBook(title, genre, status, author, price,
+                    quantity, discount); // added book to the observable list
+            tableView.getItems().add(model.book);
+            dialog.close();
 
         });
 
-        // Cancel button action
         cancelButton.setOnAction(event -> dialog.close());
     }
 
@@ -397,7 +389,7 @@ public class BookStoreView {
 
         TableView<Book> tableView = new TableView<>();
 
-        // Define columns
+        // columns
         TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
         titleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitle()));
 
@@ -428,8 +420,12 @@ public class BookStoreView {
         discountPriceColumn.setCellValueFactory(
                 cellData -> new SimpleDoubleProperty(cellData.getValue().getPriceAfterMaximumDiscount())
                         .asObject());
+        TableColumn<Book, String> targetAgeColumn = new TableColumn<>("Target Age");
+        targetAgeColumn
+                .setCellValueFactory(
+                        cellData -> new SimpleStringProperty(cellData.getValue().getTargetAgeGroup().toString()));
 
-        // Add all columns to the TableView
+        // add all the columns to the TableView
         tableView.getColumns().addAll(
                 titleColumn,
                 authorColumn,
@@ -438,21 +434,20 @@ public class BookStoreView {
                 priceColumn,
                 quantityColumn,
                 discountPercentageColumn,
-                discountPriceColumn);
+                discountPriceColumn,
+                targetAgeColumn);
 
-        // Fetch and add data
-        HashMap<Integer, Book> matchedBooks = controller.searchBooks(searchField);
-        if (matchedBooks != null && !matchedBooks.isEmpty()) {
-            // Convert the values of the HashMap to an ObservableList
-            tableView.setItems(FXCollections.observableArrayList(matchedBooks.values()));
+        if (controller.matchedBooksFromSearch(searchField) != null
+                && !controller.matchedBooksFromSearch(searchField).isEmpty()) {
+            // hashmap value to observable list value conversion
+            tableView.setItems(
+                    FXCollections.observableArrayList(controller.matchedBooksFromSearch(searchField).values()));
         }
 
-        // Add TableView to the layout
         VBox layout = new VBox(10, tableView);
         layout.setAlignment(Pos.CENTER);
 
-        // Set the scene and show the stage
-        Scene scene = new Scene(layout, 800, 400);
+        Scene scene = new Scene(layout, 1000, 400);
         searchStage.setScene(scene);
         searchStage.show();
     }

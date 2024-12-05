@@ -7,12 +7,10 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Book Store Managemnet System");
-        Book bookModel = new Book();
-        User userModel = new User();
-        BookStoreModel bookStoreModel = new BookStoreModel();
-
-        BookStoreSystemController controller = new BookStoreSystemController(bookStoreModel, bookModel, userModel);
-        BookStoreView bookStoreView = new BookStoreView(bookStoreModel, bookModel, userModel, stage, controller);
+        Model model = new Model();
+    
+        BookStoreController controller = new BookStoreController(model);
+        BookStoreView bookStoreView = new BookStoreView(model, stage, controller);
 
         Scene scene = new Scene(bookStoreView.asParent(), 600, 300);
 

@@ -1,23 +1,51 @@
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 
-class BookStoreModel implements AddRemoveBook {
-    List<Book> books = new ArrayList<>();
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-    // Comparator to sort books by title using method references
+class Model {
+    public Book book = new Book();
+    public User user = new User();
+    public BookStore bookStore = new BookStore();
+}
+
+class BookStore implements AddRemoveBook {
+    ObservableList<Book> books = FXCollections.observableArrayList();
+
+    // comparator - sort books by title using method references
     private final Comparator<Book> bookTitleComparator = Comparator.comparing(Book::getTitle);
 
-    public boolean addBook(Book book) {
+    public boolean addBook(String title, Genre genre, BookStatus status, String author, double price,
+            int quantityAvailable, int discountPercentage) {
 
-        books.add(book);
-        Collections.sort(books, bookTitleComparator); // Sort books by title after adding
+        if (genre == Genre.ART) {
+            Book artBook = new ArtBook(title, genre, status, author, price,
+                    quantityAvailable, discountPercentage);
+            books.add(artBook);
+        } else if (genre == Genre.TECHNOLOGY) {
+            Book technologyBook = new TechnologyBook(title, genre, status, author, price,
+                    quantityAvailable, discountPercentage);
+            books.add(technologyBook);
+
+        } else if (genre == Genre.SCIENCE) {
+            Book scienceBook = new ScienceBook(title, genre, status, author, price,
+                    quantityAvailable, discountPercentage);
+            books.add(scienceBook);
+
+        } else if (genre == Genre.FICTION) {
+            Book fictionBook = new FictionBook(title, genre, status, author, price,
+                    quantityAvailable, discountPercentage);
+            books.add(fictionBook);
+
+        }
+
+        Collections.sort(books, bookTitleComparator); // sort books by title after adding
         return true;
     }
 
-    public List<Book> getBookList() {
+    public ObservableList<Book> getBookList() {
         return books;
     }
 
@@ -48,7 +76,8 @@ class BookStoreModel implements AddRemoveBook {
 interface AddRemoveBook {
     public boolean removeBook(String title);
 
-    public boolean addBook(Book book);
+    public boolean addBook(String title, Genre genre, BookStatus status, String author, double price,
+            int quantityAvailable, int discountPercentage);
 }
 
 class Book {
@@ -58,17 +87,19 @@ class Book {
     private BookStatus status;
     private double price;
     private int quantityAvailable;
-    private double discountPercentage;
+    private int discountPercentage;
+    private String targetAgeGroup;
 
     public void setBookDetails(String title, Genre genre, BookStatus status, String author, double price,
-            int quantityAvailable, double discountPercentage) {
+            int quantityAvailable, int discountPercentage, String targetAgeGroup) {
         this.title = title;
         this.author = author;
-        this.genre = genre;
         this.status = status;
         this.price = price;
         this.quantityAvailable = quantityAvailable;
         this.discountPercentage = discountPercentage;
+        this.genre = genre;
+        this.targetAgeGroup = targetAgeGroup;
 
     }
 
@@ -76,12 +107,16 @@ class Book {
         return quantityAvailable;
     }
 
-    public double getDiscountPercentage() {
+    public int getDiscountPercentage() {
         return discountPercentage;
     }
 
     public void setquantityAvailable(int quantityAvailable) {
         this.quantityAvailable = quantityAvailable;
+    }
+
+    public Genre getGenre() {
+        return genre;
     }
 
     public String getTitle() {
@@ -96,12 +131,12 @@ class Book {
         return author;
     }
 
-    public Genre getGenre() {
-        return genre;
-    }
-
     public BookStatus getStatus() {
         return status;
+    }
+
+    public String getTargetAgeGroup() {
+        return targetAgeGroup;
     }
 
     public double getPriceAfterMaximumDiscount() {
@@ -113,13 +148,81 @@ class Book {
     public String toString() {
         return "-> Book Details: " +
                 "Title: " + title +
+
                 ", Author: " + author +
-                ", Genre: " + genre +
                 ", Status: " + status +
                 ", Price: $" + price +
                 ", Discount: " + discountPercentage +
                 ", Price After Maximum Discount: $" + getPriceAfterMaximumDiscount() +
                 ", Quantity Available: " + quantityAvailable;
+    }
+
+}
+
+class TechnologyBook extends Book {
+
+    public TechnologyBook(String title, Genre genre, BookStatus status, String author, double price,
+            int quantityAvailable, int discountPercentage) {
+
+        super.setBookDetails(title, Genre.TECHNOLOGY, status, author, price, quantityAvailable, discountPercentage,
+                "12 to 60 years");
+
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", " + getTargetAgeGroup();
+    }
+
+}
+
+class FictionBook extends Book {
+
+    public FictionBook(String title, Genre genre, BookStatus status, String author, double price,
+            int quantityAvailable, int discountPercentage) {
+
+        super.setBookDetails(title, Genre.FICTION, status, author, price, quantityAvailable, discountPercentage,
+                "10 to 35 years");
+
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", " + getTargetAgeGroup();
+    }
+
+}
+
+class ScienceBook extends Book {
+
+    public ScienceBook(String title, Genre genre, BookStatus status, String author, double price,
+            int quantityAvailable, int discountPercentage) {
+
+        super.setBookDetails(title, Genre.SCIENCE, status, author, price, quantityAvailable, discountPercentage,
+                "15 to 50 years");
+
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", " + getTargetAgeGroup();
+    }
+
+}
+
+class ArtBook extends Book {
+
+    public ArtBook(String title, Genre genre, BookStatus status, String author, double price,
+            int quantityAvailable, int discountPercentage) {
+
+        super.setBookDetails(title, Genre.ART, status, author, price, quantityAvailable, discountPercentage,
+                "2 to 15 years");
+
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", " + getTargetAgeGroup();
     }
 
 }
